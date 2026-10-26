@@ -1,7 +1,9 @@
 {
   "domain": "silo",
   "name": "Silo",
-  "codeowners": ["@TheBarnHome"],
+  "codeowners": [
+    "@TheBarnHome"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/TheBarnHome/silo-ha-integration",
   "integration_type": "service",
