@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 import pytest
 from custom_components.silo.const import (
     CONF_API_KEY,
@@ -277,3 +279,28 @@ async def test_duplicate_server_is_aborted(hass, aioclient_mock, mock_config_ent
 
 
 __all__ = ["MockConfigEntry"]
+
+
+async def test_options_accept_a_two_second_interval(hass, silo, mock_config_entry):
+    """The polling floor is 2 s for near-instant play/stop reactions."""
+    mock_config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    result = await hass.config_entries.options.async_init(mock_config_entry.entry_id)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {
+            CONF_UPDATE_INTERVAL: 2,
+            CONF_ENABLE_SENSORS: True,
+            CONF_INCLUDE_USERS: "",
+            CONF_EXCLUDE_USERS: "",
+        },
+    )
+    await hass.async_block_till_done()
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert mock_config_entry.options[CONF_UPDATE_INTERVAL] == 2
+    assert mock_config_entry.runtime_data.coordinator.update_interval == timedelta(
+        seconds=2
+    )

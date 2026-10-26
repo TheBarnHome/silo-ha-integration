@@ -25,9 +25,11 @@ from homeassistant.components.media_player import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.entity import generate_entity_id
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import (
@@ -110,6 +112,7 @@ async def async_setup_entry(
             async_add_entities(new_entities)
 
     _async_add_missing_entities()
+    _migrate_versioned_names(hass, entry, coordinator)
     entry.async_on_unload(coordinator.async_add_listener(_async_add_missing_entities))
 
 
@@ -136,6 +139,59 @@ def _registered_client_keys(
         if key:
             keys.append(key)
     return keys
+
+
+def _migrate_versioned_names(
+    hass: HomeAssistant, entry: ConfigEntry, coordinator: SiloCoordinator
+) -> None:
+    """Drop a client version from entity ids and device names already stored.
+
+    Before 0.2.0 an entity was named after ``client_label_full``, which carries
+    the app build ("Silo iPhone 1.1.0 (build 68)"): every app update would have
+    produced a new name, and the ids created then stay versioned forever unless
+    they are rewritten. Only clients seen in the current snapshot can be
+    rewritten, because that is what carries the clean name.
+    """
+    data = coordinator.data
+    if data is None:
+        return
+    entity_registry = er.async_get(hass)
+    device_registry = dr.async_get(hass)
+    prefix = f"{coordinator.server.installation_id}:"
+    for registry_entry in er.async_entries_for_config_entry(
+        entity_registry, entry.entry_id
+    ):
+        if registry_entry.domain != MEDIA_PLAYER_DOMAIN:
+            continue
+        if registry_entry.platform != DOMAIN:
+            continue
+        unique_id = registry_entry.unique_id or ""
+        if not unique_id.startswith(prefix):
+            continue
+        session = data.sessions_by_key.get(unique_id[len(prefix) :])
+        if session is None:
+            continue
+        desired_name = session.display_name
+        if registry_entry.device_id:
+            device = device_registry.async_get(registry_entry.device_id)
+            if device is not None and device.name and device.name != desired_name:
+                device_registry.async_update_device(
+                    registry_entry.device_id, name=desired_name
+                )
+        desired_entity_id = generate_entity_id(
+            f"{MEDIA_PLAYER_DOMAIN}.{{}}", desired_name, hass=hass
+        )
+        if (
+            desired_entity_id
+            and desired_entity_id != registry_entry.entity_id
+            and entity_registry.async_get(desired_entity_id) is None
+        ):
+            _LOGGER.info(
+                "Silo: renaming %s to %s", registry_entry.entity_id, desired_entity_id
+            )
+            entity_registry.async_update_entity(
+                registry_entry.entity_id, new_entity_id=desired_entity_id
+            )
 
 
 class SiloMediaPlayer(SiloEntity, MediaPlayerEntity):

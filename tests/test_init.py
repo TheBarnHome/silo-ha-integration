@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from custom_components.silo.const import CONF_UPDATE_INTERVAL
+from custom_components.silo.const import CONF_UPDATE_INTERVAL, DOMAIN
+from custom_components.silo.models import SiloSession
 from homeassistant.config_entries import ConfigEntryState
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import (
@@ -174,3 +176,42 @@ async def test_update_interval_option_is_applied(hass, silo, entry_factory):
 
     coordinator = entry.runtime_data.coordinator
     assert coordinator.update_interval == timedelta(seconds=30)
+
+
+async def test_versioned_entity_is_renamed(hass, silo, mock_config_entry):
+    """A 0.1.0 entity named after the app build is renamed on setup."""
+    payload = data.iphone_session()
+    session = SiloSession.from_payload(payload)
+    assert session is not None
+    key = session.client_key
+    unique_id = f"{INSTALLATION_ID}:{key}"
+
+    mock_config_entry.add_to_hass(hass)
+    entities = er.async_get(hass)
+    devices = dr.async_get(hass)
+    device = devices.async_get_or_create(
+        config_entry_id=mock_config_entry.entry_id,
+        identifiers={(DOMAIN, f"{INSTALLATION_ID}:{key}")},
+        name="Tristan · Silo iPhone 1.1.0 (build 68) (iOS)",
+    )
+    entities.async_get_or_create(
+        "media_player",
+        DOMAIN,
+        unique_id,
+        suggested_object_id="tristan_silo_iphone_1_1_0_build_68_ios",
+        config_entry=mock_config_entry,
+        device_id=device.id,
+    )
+    silo.sessions = [payload]
+
+    assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert (
+        entities.async_get_entity_id("media_player", DOMAIN, unique_id)
+        == "media_player.tristan_silo_iphone_ios"
+    )
+    renamed = devices.async_get(device.id)
+    assert renamed is not None
+    assert renamed.name == "Tristan · Silo iPhone (iOS)"
+    assert hass.states.get("media_player.tristan_silo_iphone_ios") is not None

@@ -81,7 +81,8 @@ administrateurs, et le catalogue de scopes de Silo ne contient aujourd'hui que
 
 Options (rechargées sans redémarrage) :
 
-- **Intervalle d'interrogation** : 5 à 300 s, 10 s par défaut. Silo n'ouvre pas
+- **Intervalle d'interrogation** : 2 à 300 s, 10 s par défaut (2 s pour un
+  déclenchement quasi immédiat au démarrage et à l'arrêt d'une lecture). Silo n'ouvre pas
   son socket d'événements aux clés API (`/api/v2/events/ws-ticket` les refuse),
   les sessions sont donc interrogées par polling : une commande partie d'ailleurs
   peut mettre jusqu'à un intervalle à apparaître.
@@ -90,6 +91,10 @@ Options (rechargées sans redémarrage) :
 
 ## Fonctionnement
 
+- Le nom d'une entité ne contient ni version ni build de l'application
+  (`Tristan · Silo iPhone (iOS)`, pas `… 1.1.0 (build 68)`) : une mise à jour
+  du client ne la renomme pas. Les identifiants créés avant la 0.2.0 sont
+  réécrits au démarrage dès que le client rejoue.
 - Une entité est créée par couple **(compte, nom du client, plateforme)** et
   conservée en `idle` entre deux lectures, comme l'intégration Plex conserve ses
   clients. Ses `entity_id` restent stables après un redémarrage de Home

@@ -15,7 +15,7 @@ MANUFACTURER: Final = "Silo"
 
 DEFAULT_TIMEOUT: Final = 10
 DEFAULT_UPDATE_INTERVAL: Final = 10
-UPDATE_INTERVAL_CHOICES: Final = (5, 10, 15, 30, 60, 120, 300)
+UPDATE_INTERVAL_CHOICES: Final = (2, 5, 10, 15, 30, 60, 120, 300)
 
 # Statistics are far less volatile than live sessions.
 STATS_REFRESH_SECONDS: Final = 300

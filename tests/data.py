@@ -15,6 +15,7 @@ WEB_USER_AGENT = (
     "(KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
 )
 TV_USER_AGENT = "Silo/1.4.2 (AppleTV; tvOS 26.0)"
+IOS_USER_AGENT = "Silo/1.1.0 (iPhone; iOS 26.0)"
 
 
 def system_info_payload(api_major: int = 2) -> dict[str, Any]:
@@ -197,6 +198,27 @@ def episode_session(**overrides: Any) -> dict[str, Any]:
         target_audio_channels=2,
         source_video_resolution="2160p",
         source_audio_channels=8,
+    )
+    payload.update(overrides)
+    return payload
+
+
+def iphone_session(**overrides: Any) -> dict[str, Any]:
+    """Return an iOS session whose labels carry the app version and build."""
+    payload = movie_session(
+        session_id="12",
+        user_id="7",
+        username="Tristan",
+        profile_name="Tristan",
+        media_title="Le Fabuleux Destin des Oiseaux",
+        media_type="movie",
+        client_name="Silo iPhone",
+        client_version="1.1.0",
+        client_build="68",
+        client_channel="release",
+        client_label="Silo iPhone 1.1.0",
+        client_label_full="Silo iPhone 1.1.0 (build 68)",
+        client_user_agent=IOS_USER_AGENT,
     )
     payload.update(overrides)
     return payload

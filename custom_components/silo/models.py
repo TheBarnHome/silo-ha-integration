@@ -50,7 +50,10 @@ PLATFORM_LABELS: Final[dict[str, str]] = {
     "linux": "Linux",
 }
 
-_VERSION_SUFFIX: Final = re.compile(r"\s+v?\d+(?:\.\d+)+\s*$")
+_BUILD_SUFFIX: Final = re.compile(r"\s*\((?:build\s*)?\d+\)\s*$")
+_VERSION_SUFFIX: Final = re.compile(
+    r"\s+v?\d+(?:\.\d+)*(?:\s*\((?:build\s*)?\d+\))?\s*$"
+)
 
 
 def _text(data: Mapping[str, Any], key: str) -> str | None:
@@ -110,8 +113,13 @@ def _slug(value: str) -> str:
 
 
 def strip_version(label: str) -> str:
-    """Drop a trailing version so a client update does not rename an entity."""
-    stripped = _VERSION_SUFFIX.sub("", label).strip()
+    """Drop trailing version, build and channel so an app update keeps the name.
+
+    Silo labels carry the client build ("Silo iPhone 1.1.0 (build 68)"); an
+    entity named after them would be renamed on every app release.
+    """
+    stripped = _BUILD_SUFFIX.sub("", label)
+    stripped = _VERSION_SUFFIX.sub("", stripped).strip()
     return stripped or label
 
 
@@ -265,8 +273,9 @@ class SiloSession:
     @property
     def display_name(self) -> str:
         """Return the entity name: who is watching, where."""
+        # client_label has no build or channel; client_label_full adds them.
         core = strip_version(
-            self.client_label_full or self.client_label or self.client_name or "Silo"
+            self.client_label or self.client_label_full or self.client_name or "Silo"
         )
         platform = self.platform_label
         if platform:

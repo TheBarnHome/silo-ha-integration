@@ -26,6 +26,33 @@ def test_key_is_stable_across_client_versions():
     assert first.display_name == "tristan · Silo Web (macOS)"
 
 
+def test_display_name_has_no_version_or_build():
+    """A client app update must not rename the entity."""
+    session = SiloSession.from_payload(data.iphone_session())
+
+    assert session is not None
+    assert session.platform == "ios"
+    assert session.display_name == "Tristan · Silo iPhone (iOS)"
+
+
+@pytest.mark.parametrize(
+    ("label", "expected"),
+    [
+        ("Silo iPhone 1.1.0 (build 68)", "Silo iPhone"),
+        ("Silo iPhone 1.1.0", "Silo iPhone"),
+        ("Silo (build 68)", "Silo"),
+        ("Chrome 142", "Chrome"),
+        ("Silo Web", "Silo Web"),
+        ("Silo", "Silo"),
+    ],
+)
+def test_version_and_build_suffixes_are_stripped(label, expected):
+    """Every label flavour Silo reports loses its build noise."""
+    from custom_components.silo.models import strip_version
+
+    assert strip_version(label) == expected
+
+
 def test_two_accounts_never_share_an_entity():
     """The same device used by two accounts is two players."""
     first = SiloSession.from_payload(
