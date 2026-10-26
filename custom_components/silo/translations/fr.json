@@ -1,0 +1,77 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Serveur Silo",
+        "description": "Saisissez l'URL de votre serveur Silo et une clé API non scopée appartenant à un compte administrateur. Les sessions de lecture sont lues sur l'API d'administration : une clé scopée est refusée par le serveur.",
+        "data": {
+          "url": "URL du serveur",
+          "api_key": "Clé API",
+          "verify_ssl": "Vérifier le certificat TLS"
+        },
+        "data_description": {
+          "api_key": "Créée dans Silo sous Administration → Clés API. Elle doit appartenir à un compte administrateur."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Réauthentifier Silo",
+        "description": "La clé API utilisée pour {url} a été refusée. Saisissez une nouvelle clé.",
+        "data": {
+          "api_key": "Clé API"
+        }
+      }
+    },
+    "error": {
+      "invalid_url": "Ce n'est pas une URL HTTP ou HTTPS valide.",
+      "invalid_auth": "Silo a refusé cette clé API.",
+      "not_admin": "Cette clé API n'appartient pas à un compte administrateur ; Silo n'expose les sessions en cours qu'aux administrateurs.",
+      "unsupported_api": "Ce serveur ne sert pas l'API native v2 de Silo.",
+      "cannot_connect": "Impossible de joindre ce serveur Silo.",
+      "unknown": "Erreur inattendue, voir le journal de Home Assistant."
+    },
+    "abort": {
+      "already_configured": "Ce serveur Silo est déjà configuré.",
+      "reauth_successful": "La clé API a été mise à jour."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options Silo",
+        "data": {
+          "update_interval": "Intervalle d'interrogation",
+          "enable_sensors": "Créer les capteurs de bibliothèque",
+          "include_users": "Uniquement ces utilisateurs",
+          "exclude_users": "Ignorer ces utilisateurs"
+        },
+        "data_description": {
+          "update_interval": "Les sessions sont interrogées par polling : Silo n'ouvre pas son socket d'événements aux clés API.",
+          "include_users": "Noms de compte séparés par des virgules. Vide = tous les comptes.",
+          "exclude_users": "Noms de compte à ignorer, séparés par des virgules."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "watching": {
+        "name": "En lecture"
+      },
+      "movies": {
+        "name": "Films"
+      },
+      "shows": {
+        "name": "Séries"
+      },
+      "files": {
+        "name": "Fichiers"
+      },
+      "users": {
+        "name": "Utilisateurs"
+      },
+      "storage": {
+        "name": "Stockage"
+      }
+    }
+  }
+}

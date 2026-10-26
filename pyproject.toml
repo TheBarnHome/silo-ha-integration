@@ -1,0 +1,59 @@
+[project]
+name = "ha-silo"
+version = "0.1.0"
+description = "Home Assistant custom integration for the Silo media server"
+readme = "README.md"
+requires-python = ">=3.14"
+license = { text = "MIT" }
+authors = [{ name = "Tristan Balege" }]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Home Automation",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/TheBarnHome/silo-ha-integration"
+Issues = "https://github.com/TheBarnHome/silo-ha-integration/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+norecursedirs = [".dev", "custom_components", ".git"]
+filterwarnings = [
+  # Home Assistant's test harness emits a few of these on 3.14.
+  "ignore::DeprecationWarning:pytest_homeassistant_custom_component.*",
+]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 88
+src = ["custom_components", "tests"]
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "F",   # pyflakes
+  "W",   # pycodestyle warnings
+  "I",   # import sorting
+  "UP",  # pyupgrade
+  "B",   # bugbear
+  "C4",  # comprehensions
+  "SIM", # simplify
+  "RUF", # ruff-specific
+  "ASYNC",
+  "DTZ",
+  "PIE",
+  "RET",
+  "T20", # no print
+]
+ignore = [
+  "RUF012", # mutable class attributes without ClassVar
+  "DTZ005", # datetime.now without tz, never used here
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["T20", "RUF001", "RUF002"]

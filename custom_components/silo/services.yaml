@@ -1,0 +1,51 @@
+# Services for the Silo integration. Home Assistant loads this file to build the
+# developer tools UI; the actual calls are registered by the integration.
+send_message:
+  name: Send a message
+  description: Display a message on the player of a live Silo session.
+  target:
+    entity:
+      integration: silo
+      domain: media_player
+  fields:
+    message:
+      required: true
+      example: "Les lunettes de réalité virtuelle sont chargées."
+      selector:
+        text:
+    title:
+      example: "Message de la maison"
+      selector:
+        text:
+    reason:
+      example: "Home Assistant"
+      selector:
+        text:
+terminate_session:
+  name: Terminate a session
+  description: Revoke a live session's playback authority. Unlike stop, already delivered media stops being authorised.
+  target:
+    entity:
+      integration: silo
+      domain: media_player
+  fields:
+    reason:
+      example: "Révoquée depuis Home Assistant"
+      selector:
+        text:
+scan_library:
+  name: Scan a library
+  description: Ask Silo to scan one of its libraries, a subtree or a single file.
+  fields:
+    library_id:
+      required: true
+      example: "3"
+      selector:
+        text:
+    path:
+      example: "/media/films/Nouveautés"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        text:

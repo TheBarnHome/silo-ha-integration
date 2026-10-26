@@ -1,0 +1,11 @@
+{
+  "domain": "silo",
+  "name": "Silo",
+  "codeowners": ["@TheBarnHome"],
+  "config_flow": true,
+  "documentation": "https://github.com/TheBarnHome/silo-ha-integration",
+  "integration_type": "service",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/TheBarnHome/silo-ha-integration/issues",
+  "version": "0.1.0"
+}

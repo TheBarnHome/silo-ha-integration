@@ -1,0 +1,77 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Silo server",
+        "description": "Enter the URL of your Silo server and an unscoped API key owned by an administrator account. Playback sessions are read from the administrator API, so a scoped key is refused by the server.",
+        "data": {
+          "url": "Server URL",
+          "api_key": "API key",
+          "verify_ssl": "Verify the TLS certificate"
+        },
+        "data_description": {
+          "api_key": "Created in Silo under Administration → API keys. It must belong to an administrator account."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate Silo",
+        "description": "The API key used for {url} was refused. Enter a new key.",
+        "data": {
+          "api_key": "API key"
+        }
+      }
+    },
+    "error": {
+      "invalid_url": "This is not a valid HTTP or HTTPS URL.",
+      "invalid_auth": "Silo refused this API key.",
+      "not_admin": "This API key does not belong to an administrator account; Silo only exposes live sessions to administrators.",
+      "unsupported_api": "This server does not serve Silo's native API v2.",
+      "cannot_connect": "Cannot reach this Silo server.",
+      "unknown": "Unexpected error, check the Home Assistant log."
+    },
+    "abort": {
+      "already_configured": "This Silo server is already configured.",
+      "reauth_successful": "The API key was updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Silo options",
+        "data": {
+          "update_interval": "Polling interval",
+          "enable_sensors": "Create library statistics sensors",
+          "include_users": "Only these users",
+          "exclude_users": "Ignore these users"
+        },
+        "data_description": {
+          "update_interval": "Live sessions are polled: Silo does not expose its event socket to API keys.",
+          "include_users": "Comma-separated account names. Leave empty to watch every account.",
+          "exclude_users": "Comma-separated account names to ignore."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "watching": {
+        "name": "Watching"
+      },
+      "movies": {
+        "name": "Movies"
+      },
+      "shows": {
+        "name": "Shows"
+      },
+      "files": {
+        "name": "Files"
+      },
+      "users": {
+        "name": "Users"
+      },
+      "storage": {
+        "name": "Storage"
+      }
+    }
+  }
+}
